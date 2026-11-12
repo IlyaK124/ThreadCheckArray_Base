@@ -1,31 +1,31 @@
 import java.util.ArrayList;
 
 /**
- * Implements a worker thread that searches for a subset of integers
- * whose sum equals a specified target value.
+ * A worker thread responsible for searching for a subset of integers
+ * whose sum matches a specified target.
  *
- * <p>The input values are stored in an {@code ArrayList<Integer>},
- * while the selected subset is represented by a {@code boolean[]}.
+ * <p>The input collection is represented by an
+ * {@code ArrayList<Integer>}, while the result is maintained
+ * using a primitive {@code boolean[]} array.
  *
- * <p>The worker communicates with other threads through a shared
- * {@link SharedData} object. Synchronization is used when accessing
- * the shared result state.
+ * <p>Synchronization through {@link SharedData} allows multiple
+ * threads to communicate their search results.
  */
 public class ThreadCheckArray implements Runnable {
 
     /** Indicates whether this worker has found a matching subset. */
     private boolean flag;
 
-    /** Indicates which input elements belong to the matching subset. */
+    /** Marks the elements that belong to the matching subset. */
     private boolean[] winArray;
 
-    /** Shared data used for communication between worker threads. */
+    /** Shared object used to communicate between worker threads. */
     SharedData sd;
 
-    /** Input values used in the subset search. */
+    /** Collection containing the integer values to be examined. */
     ArrayList<Integer> array;
 
-    /** Target sum that the worker attempts to find. */
+    /** Target sum for the subset search. */
     int b;
 
     /**
@@ -51,16 +51,17 @@ public class ThreadCheckArray implements Runnable {
     }
 
     /**
-     * Recursively searches for a subset whose sum equals the target.
+     * Recursively checks whether a subset of the first n elements
+     * can satisfy the remaining target sum.
      *
-     * <p>For each element, the algorithm explores two possibilities:
-     * including the element or excluding it from the subset.
+     * <p>Each recursive step examines the possibilities of
+     * including or excluding the current element.
      *
-     * <p>The search may terminate early if another worker has
-     * already found a matching subset.
+     * <p>The search checks the shared flag to detect whether
+     * another worker has already found a solution.
      *
-     * @param n the number of elements currently considered
-     * @param b the remaining target sum
+     * @param n number of elements currently considered
+     * @param b remaining sum to be matched
      */
     void rec(int n, int b) {
 
@@ -98,14 +99,18 @@ public class ThreadCheckArray implements Runnable {
     }
 
     /**
-     * Executes the subset search for the current worker thread.
+     * Executes the subset search for the current worker.
      *
-     * <p>When more than one input element exists, the thread named
-     * {@code thread1} searches using the last element as part of
-     * the initial subset, while the other thread searches without it.
+     * <p>The thread named {@code thread1} starts by considering
+     * the last element as included in the subset, while the
+     * other worker starts without that element.
      *
-     * <p>If a matching subset is found, the result is stored in
-     * the shared {@link SharedData} object.
+     * <p>When a matching subset is found, the worker updates
+     * the shared result through {@link SharedData}.
+     *
+     * <p>The input is accessed through {@code ArrayList<Integer>}
+     * operations, while subset membership is stored in
+     * a primitive {@code boolean[]} array.
      */
     @Override
     public void run() {
